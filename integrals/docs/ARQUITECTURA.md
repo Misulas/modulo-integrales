@@ -138,7 +138,9 @@ Es netamente para tener una trazabilidad/logs por interacción.
 
 ## 11. Cambios mínimos al compose
 
-- Agregar `rabbitmq` (con healthcheck), `integrals` e `integrals-mongodb`.
-- Agregar `RABBITMQ_URL` a `messages` y `depends_on: rabbitmq (healthy)`. Es configuración. Sin esto `messages` no publica, y como ignora los fallos de publicación, los primeros eventos se perderían en silencio.
+El `docker-compose.yaml` de este repositorio levanta solo `integrals`; el chat base corre en su propio compose y comparten la red externa `microsvcs`.
+
+- Este stack agrega `rabbitmq` (con healthcheck), `integrals` e `integrals-mongodb`.
+- En el compose del chat base, agregar `RABBITMQ_URL` a `messages`. Es configuración. Sin esto `messages` no publica, y como ignora los fallos de publicación, los primeros eventos se perderían en silencio.
 - `integrals` no usa `--reload` en su Dockerfile.
 

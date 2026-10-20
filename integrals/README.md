@@ -5,16 +5,35 @@ El diseño, los contratos y las decisiones están en [`docs/ARQUITECTURA.md`](do
 
 ## Ejecutar
 
-Desde la carpeta `demo/`:
+Este repositorio contiene solo `integrals` y su infraestructura (`rabbitmq` e `integrals-mongodb`).
+El chat base (`users`, `channels`, `messages`) se levanta por separado y crea la red Docker `microsvcs`,
+a la que se une este stack. Ver la sección *Requisitos del chat base*.
 
-```bash
-docker compose up --build
-```
+1. Levantar el chat base primero (crea la red `microsvcs`), desde su carpeta:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+2. Levantar `integrals` desde la raíz de este repositorio:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+Para detener, `docker compose down` en cada carpeta (primero este stack, luego el base, que es dueño de la red).
 
 | Servicio | URL |
 | --- | --- |
 | `integrals` (API y `/docs`) | http://localhost:8004 |
 | RabbitMQ (gestión, usuario `guest`/`guest`) | http://localhost:15672 |
+
+### Requisitos del chat base
+
+- Sus servicios deben estar en la red `microsvcs` con los nombres `users` y `messages`.
+- `messages` necesita `RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/`. Sin esto no publica
+  `chat.message.created` y el comando `/integralcalc` no llega a `integrals`.
+- `rabbitmq` vive en este stack. Si `messages` publica antes de que esté arriba, el evento se pierde.
 
 ## Probar por REST
 
