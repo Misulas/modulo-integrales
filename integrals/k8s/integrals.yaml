@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integrals
+spec:
+  selector:
+    matchLabels:
+      app: integrals
+  template:
+    metadata:
+      labels:
+        app: integrals
+    spec:
+      containers:
+        - name: integrals
+          image: ghcr.io/misulas/integrals:v1
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MONGODB_URL
+              value: "mongodb://integrals-mongodb:27017"
+            - name: RABBITMQ_URL
+              value: "amqp://guest:guest@integrals-rabbitmq:5672/"
+            - name: USERS_URL
+              value: "http://users.servicios-base.svc.cluster.local:8000"
+            - name: MESSAGES_URL
+              value: "http://messages.servicios-base.svc.cluster.local:8000"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: integrals
+spec:
+  selector:
+    app: integrals
+  ports:
+    - port: 80
+      targetPort: 8000
